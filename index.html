@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>StaffSync — Smart Employee Scheduling</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<style>
+:root{
+  --bg:#05070b;--panel:#0d121b;--panel2:#111927;--ink:#f5f9ff;--muted:#8ea0b8;
+  --brand:#1488ff;--brand2:#0057ff;--brand3:#62b6ff;--ok:#32d583;--warn:#ffb547;
+  --bad:#ff5d6c;--line:#223049;--soft:#0b2546;--input:#09101a
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:radial-gradient(circle at 85% 0%,rgba(20,136,255,.14),transparent 30%),radial-gradient(circle at 0% 25%,rgba(0,87,255,.10),transparent 24%),var(--bg);color:var(--ink);min-height:100vh}
+button,input,select{font:inherit}.wrap{max-width:1180px;margin:auto;padding:18px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;background:linear-gradient(120deg,#07111f 0%,#0d2c55 48%,#075fc7 100%);color:#fff;padding:20px 22px;border:1px solid #1d5da1;border-radius:20px;box-shadow:0 14px 40px rgba(0,87,255,.16)}
+.brand{display:flex;gap:12px;align-items:center}.logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(145deg,var(--brand3),var(--brand2));color:#001324;display:grid;place-items:center;font-weight:900;font-size:22px;box-shadow:0 0 28px rgba(20,136,255,.30)}.top h1{font-size:24px;margin:0}.top p{margin:4px 0 0;color:#cfe7ff;font-size:14px}.pill{padding:8px 12px;background:rgba(20,136,255,.12);border:1px solid rgba(98,182,255,.35);border-radius:999px;font-size:13px;white-space:nowrap}
+nav{display:flex;gap:8px;overflow:auto;margin:18px 0;padding-bottom:2px}.tab{border:1px solid var(--line);background:#0a0f17;color:#b9c7d9;padding:10px 14px;border-radius:12px;cursor:pointer}.tab:hover{border-color:#2d6cae;color:#fff}.tab.active{background:linear-gradient(135deg,var(--brand2),var(--brand));border-color:#3399ff;color:white;box-shadow:0 7px 18px rgba(0,87,255,.22)}
+.grid{display:grid;gap:16px}.grid.cols3{grid-template-columns:repeat(3,1fr)}.grid.cols2{grid-template-columns:repeat(2,1fr)}.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 12px 28px rgba(0,0,0,.25)}.card h2,.card h3{margin:0 0 10px}.muted{color:var(--muted)}.metric{font-size:34px;font-weight:800;letter-spacing:-1px}.small{font-size:13px}.status{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:700}.ok{background:rgba(50,213,131,.12);color:#5fe6a0}.warn{background:rgba(255,181,71,.12);color:#ffc76b}.bad{background:rgba(255,93,108,.12);color:#ff7f8b}.dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+.btn{border:1px solid transparent;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:800;transition:.15s ease}.btn:hover{transform:translateY(-1px)}.btn.primary{background:linear-gradient(135deg,var(--brand2),var(--brand));color:#fff;box-shadow:0 7px 18px rgba(0,87,255,.18)}.btn.ghost{background:#0b2340;color:#7fc2ff;border-color:#174b7f}.btn.danger{background:#35131a;color:#ff8a95;border-color:#6c2430}.btn.full{width:100%}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.space{justify-content:space-between}.field{display:grid;gap:6px}.field label{font-size:12px;color:#9cb0c8;font-weight:700}.field input,.field select{width:100%;padding:10px 11px;border:1px solid #263853;border-radius:10px;background:var(--input);color:var(--ink);outline:none}.field input:focus,.field select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(20,136,255,.13)}
+.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.dayrow{display:grid;grid-template-columns:90px 72px 1fr 1fr;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}.table{width:100%;border-collapse:collapse}.table th,.table td{text-align:left;padding:11px 8px;border-bottom:1px solid var(--line);font-size:13px}.table th{color:#94a9c2;font-weight:700}.coverage{height:10px;background:#172132;border-radius:999px;overflow:hidden}.coverage span{display:block;height:100%;background:linear-gradient(90deg,var(--brand2),var(--brand3));border-radius:999px}.shift,.swapitem{border:1px solid var(--line);border-radius:14px;padding:12px;margin:9px 0;background:#0a1019}.shift strong{display:block}
+.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}.qr{border:1px solid #285988;border-radius:16px;min-height:250px;display:grid;place-items:center;text-align:center;padding:16px;background:linear-gradient(180deg,rgba(20,136,255,.08),rgba(0,0,0,.05)),#080d14}.qr-frame{background:#fff;padding:12px;border-radius:16px;display:inline-flex;box-shadow:0 0 28px rgba(20,136,255,.16)}.qr-frame img{width:184px;height:184px;display:block}.qr-tools{display:grid;gap:10px;margin-top:12px}.qr-target{display:flex;gap:8px;align-items:center}.qr-target input{flex:1;min-width:0;padding:9px 10px;border:1px solid #263853;border-radius:10px;background:#070c12;color:#cfe7ff}.qr-note{font-size:12px;line-height:1.4;color:#90a8c3}
+.hidden{display:none!important}.calloutBox{border-left:4px solid var(--bad)}.notice{background:#0c2035;border:1px solid #1e5483;border-radius:12px;padding:12px;font-size:13px;color:#cce7ff}.list{display:grid;gap:8px}.candidate{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:12px;background:#0a1019}.kicker{text-transform:uppercase;letter-spacing:.12em;font-size:11px;color:#64b5ff;font-weight:900}.section{display:none}.section.active{display:block}.footer{padding:18px 4px;color:#73869c;font-size:12px;text-align:center}a{color:#6abbff}
+@media(max-width:820px){.grid.cols3,.grid.cols2,.hero,.formgrid{grid-template-columns:1fr}.dayrow{grid-template-columns:72px 60px 1fr 1fr}.top{align-items:flex-start;flex-direction:column}.wrap{padding:12px}.metric{font-size:30px}.qr-target{flex-direction:column;align-items:stretch}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><div class="logo">S</div><div><h1>StaffSync</h1><p>Availability, coverage, callouts, and shift swaps in one place.</p></div></div>
+    <div class="pill">Demo company · 24/7 staffing</div>
+  </header>
+
+  <nav id="tabs">
+    <button class="tab active" data-tab="home">Overview</button>
+    <button class="tab" data-tab="availability">My Availability</button>
+    <button class="tab" data-tab="schedule">My Schedule</button>
+    <button class="tab" data-tab="swap">Shift Swap</button>
+    <button class="tab" data-tab="callout">Callout / Sick</button>
+    <button class="tab" data-tab="manager">Manager Dashboard</button>
+  </nav>
+
+  <section id="home" class="section active">
+    <div class="hero">
+      <div class="card">
+        <div class="kicker">Scheduling problem solver</div>
+        <h2 style="font-size:30px;margin-top:6px">Keep every shift covered—before shortages happen.</h2>
+        <p class="muted">Employees submit availability from their phones, request instant swaps, and report callouts. Managers see gaps, reserve coverage, and replacement suggestions in real time.</p>
+        <div class="row"><button class="btn primary" onclick="openTab('availability')">Enter availability</button><button class="btn ghost" onclick="openTab('swap')">Swap a shift</button></div>
+      </div>
+      <div class="card">
+        <div class="row space"><div><div class="kicker">Scan & open</div><h3>Employee QR Access</h3></div><span class="status ok"><span class="dot"></span>QR ready</span></div>
+        <div class="qr"><div><div class="qr-frame"><img id="qrImage" src="favicon.svg" alt="StaffSync employee access QR code"></div><div style="font-weight:800;margin-top:10px">Scan to open My Availability</div><div class="qr-note" id="qrStatus" style="margin-top:5px">Preparing employee link…</div></div></div>
+        <div class="qr-tools">
+          <div class="qr-target"><input id="qrUrl" aria-label="QR target URL" /><button class="btn ghost" onclick="updateQR()">Update QR</button></div>
+          <div class="row"><button class="btn primary" onclick="openTab('availability')">Test employee flow</button><button class="btn ghost" onclick="copyQRLink()">Copy employee link</button></div>
+          <div class="qr-note">After this site is published on GitHub Pages, the QR automatically uses the live site URL and opens the employee availability screen. You can also paste a different public URL here anytime.</div>
+        </div>
+      </div>
+    </div>
+    <div class="grid cols3" style="margin-top:16px">
+      <div class="card"><div class="muted small">7-day coverage score</div><div class="metric" id="coverageScore">92%</div><div class="status ok"><span class="dot"></span>Mostly covered</div></div>
+      <div class="card"><div class="muted small">Shifts needing backup</div><div class="metric" id="gapCount">2</div><div class="status warn"><span class="dot"></span>Action recommended</div></div>
+      <div class="card"><div class="muted small">Open swap requests</div><div class="metric" id="swapCount">2</div><div class="status ok"><span class="dot"></span>Matchable</div></div>
+    </div>
+    <div class="grid cols2" style="margin-top:16px">
+      <div class="card"><h3>How it works</h3><div class="list">
+        <div>1. Employees scan the QR and submit weekly availability.</div><div>2. The schedule engine compares coverage to minimum staffing.</div><div>3. Callouts trigger a backup candidate list instead of a staffing scramble.</div><div>4. Employees can offer and accept compatible shift swaps instantly.</div>
+      </div></div>
+      <div class="card"><h3>Smart callout protection</h3><p class="muted">Rather than labeling individual employees as “likely to call out,” StaffSync adds a staffing buffer to historically fragile shifts and keeps a voluntary backup pool.</p><div class="notice">Demo rule: Friday evening and weekend morning shifts target +1 reserve employee when availability allows.</div></div>
+    </div>
+  </section>
+
+  <section id="availability" class="section">
+    <div class="card">
+      <div class="row space"><div><div class="kicker">Employee input</div><h2>My Availability</h2></div><span class="status ok"><span class="dot"></span>Mobile friendly</span></div>
+      <div class="formgrid" style="margin:14px 0">
+        <div class="field"><label>Employee name</label><input id="empName" value="Alex Rivera" /></div>
+        <div class="field"><label>Employment type</label><select id="empType"><option>Full time</option><option>Part time</option></select></div>
+        <div class="field"><label>Preferred weekly hours</label><input id="prefHours" type="number" value="40" min="4" max="60" /></div>
+        <div class="field"><label>Can join backup pool?</label><select id="backup"><option>Yes</option><option>No</option></select></div>
+      </div>
+      <div id="days"></div>
+      <div class="row" style="margin-top:14px"><button class="btn primary" onclick="saveAvailability()">Save availability</button><span id="saveMsg" class="muted small"></span></div>
+    </div>
+  </section>
+
+  <section id="schedule" class="section">
+    <div class="grid cols2">
+      <div class="card"><h2>My Schedule</h2><p class="muted">Sample schedule for Alex Rivera</p><div id="mySchedule"></div></div>
+      <div class="card"><h3>Weekly hours</h3><div class="metric">36</div><div class="coverage"><span style="width:90%"></span></div><p class="small muted">36 of 40 preferred hours scheduled.</p><button class="btn ghost" onclick="openTab('availability')">Update availability</button></div>
+    </div>
+  </section>
+
+  <section id="swap" class="section">
+    <div class="grid cols2">
+      <div class="card"><h2>Offer a Shift</h2><p class="muted">Post one of your assigned shifts to the swap board.</p>
+        <div class="field"><label>Your shift</label><select id="swapShift"></select></div>
+        <div class="field" style="margin-top:10px"><label>Preferred replacement</label><select id="swapPref"><option>Any compatible shift</option><option>Morning shift</option><option>Evening shift</option><option>Night shift</option></select></div>
+        <button class="btn primary full" style="margin-top:12px" onclick="postSwap()">Post swap request</button>
+      </div>
+      <div class="card"><div class="row space"><h2>Swap Board</h2><span class="status ok"><span class="dot"></span>Instant accept</span></div><div id="swapBoard"></div></div>
+    </div>
+  </section>
+
+  <section id="callout" class="section">
+    <div class="grid cols2">
+      <div class="card calloutBox"><h2>Report a Callout</h2><p class="muted">Select the shift you cannot work. The manager dashboard will immediately flag the gap and show available backup employees.</p><div class="field"><label>Shift</label><select id="calloutShift"></select></div><div class="field" style="margin-top:10px"><label>Reason</label><select id="calloutReason"><option>Sick</option><option>Family emergency</option><option>Transportation issue</option><option>Other</option></select></div><button class="btn danger full" style="margin-top:12px" onclick="reportCallout()">Report callout</button><div id="calloutMsg" class="small muted" style="margin-top:10px"></div></div>
+      <div class="card"><h3>Backup pool</h3><p class="muted">Volunteers whose saved availability overlaps the uncovered shift.</p><div id="backupList" class="list"></div></div>
+    </div>
+  </section>
+
+  <section id="manager" class="section">
+    <div class="row space" style="margin-bottom:14px"><div><div class="kicker">Manager tools</div><h2 style="margin:4px 0">Coverage Dashboard</h2></div><button class="btn primary" onclick="autofill()">Suggest gap coverage</button></div>
+    <div class="grid cols3">
+      <div class="card"><div class="muted small">Minimum staff / shift</div><div class="metric">3</div></div>
+      <div class="card"><div class="muted small">Reserve employees</div><div class="metric">4</div></div>
+      <div class="card"><div class="muted small">Urgent gaps</div><div class="metric" id="urgentGaps">1</div></div>
+    </div>
+    <div class="card" style="margin-top:16px"><h3>Next 7 days coverage</h3><div style="overflow:auto"><table class="table" id="coverageTable"><thead><tr><th>Day</th><th>Shift</th><th>Scheduled</th><th>Minimum</th><th>Status</th><th>Action</th></tr></thead><tbody></tbody></table></div></div>
+    <div class="grid cols2" style="margin-top:16px"><div class="card"><h3>Recommended backup assignments</h3><div id="recommendations" class="list"></div></div><div class="card"><h3>Manager rules</h3><div class="list small"><div>• Never schedule outside submitted availability.</div><div>• Respect full-time/part-time preferred hours.</div><div>• Prioritize voluntary backup-pool employees for callout coverage.</div><div>• Require manager approval for swaps that create overtime or skill-mix issues.</div></div></div></div>
+  </section>
+
+  <div class="footer">StaffSync prototype · GitHub Pages-ready front-end demo · Data is stored only in this browser.</div>
+</div>
+<script>
+const days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const shifts=[
+{id:1,day:'Monday',time:'7:00 AM – 3:00 PM',label:'Morning'},
+{id:2,day:'Tuesday',time:'3:00 PM – 11:00 PM',label:'Evening'},
+{id:3,day:'Thursday',time:'7:00 AM – 3:00 PM',label:'Morning'},
+{id:4,day:'Friday',time:'3:00 PM – 11:00 PM',label:'Evening'},
+{id:5,day:'Sunday',time:'7:00 AM – 11:00 AM',label:'Morning'}
+];
+let swaps=[
+{id:101,person:'Jamie Lee',shift:'Saturday · 7:00 AM – 3:00 PM',want:'Evening shift',status:'Open'},
+{id:102,person:'Morgan Diaz',shift:'Wednesday · 3:00 PM – 11:00 PM',want:'Morning shift',status:'Open'}
+];
+let coverage=[
+['Monday','Morning',3,3],['Monday','Evening',4,3],['Tuesday','Morning',3,3],['Tuesday','Evening',3,3],['Wednesday','Morning',2,3],['Wednesday','Night',3,3],['Thursday','Morning',4,3],['Friday','Evening',3,4],['Saturday','Morning',3,4],['Sunday','Morning',4,4]
+];
+const backups=[['Taylor Kim','Part time','Available · 7 AM–3 PM'],['Jordan Patel','Full time','Backup pool · flexible'],['Sam Wilson','Part time','Available · evenings'],['Chris Nguyen','Full time','Available · weekends']];
+
+function employeeLinkFrom(base){
+  try{
+    const u=new URL(base,window.location.href);
+    u.searchParams.set('view','availability');
+    return u.href;
+  }catch(e){return base;}
+}
+function currentEmployeeLink(){
+  const saved=localStorage.getItem('staffsync_public_url');
+  const base=saved || window.location.href.split('?')[0].split('#')[0];
+  return employeeLinkFrom(base);
+}
+function setQRImage(target){
+  document.getElementById('qrImage').src='https://api.qrserver.com/v1/create-qr-code/?size=360x360&margin=10&data='+encodeURIComponent(target);
+}
+function updateQR(){
+  const raw=document.getElementById('qrUrl').value.trim();
+  if(!raw) return;
+  let normalized=raw;
+  if(!/^https?:\/\//i.test(normalized) && !/^file:/i.test(normalized)) normalized='https://'+normalized;
+  const target=employeeLinkFrom(normalized);
+  localStorage.setItem('staffsync_public_url',normalized.split('?')[0]);
+  document.getElementById('qrUrl').value=target;
+  setQRImage(target);
+  document.getElementById('qrStatus').textContent='QR target: '+target;
+}
+function initQR(){
+  const target=currentEmployeeLink();
+  document.getElementById('qrUrl').value=target;
+  setQRImage(target);
+  if(location.protocol==='file:' || location.protocol==='sandbox:'){
+    document.getElementById('qrStatus').textContent='Preview mode: test the flow below. Paste a public site URL for phone scanning.';
+  }else{
+    document.getElementById('qrStatus').textContent='Scan to open StaffSync directly on My Availability.';
+  }
+}
+async function copyQRLink(){
+  const link=document.getElementById('qrUrl').value;
+  try{await navigator.clipboard.writeText(link);document.getElementById('qrStatus').textContent='Employee link copied.';}
+  catch(e){document.getElementById('qrUrl').select();document.execCommand('copy');document.getElementById('qrStatus').textContent='Employee link copied.';}
+}
+
+function openTab(id){document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelector(`.tab[data-tab="${id}"]`).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+document.getElementById('tabs').addEventListener('click',e=>{if(e.target.matches('.tab'))openTab(e.target.dataset.tab)});
+
+function initDays(){const host=document.getElementById('days');host.innerHTML='';days.forEach((d,i)=>{host.innerHTML+=`<div class="dayrow"><strong>${d}</strong><label class="small"><input type="checkbox" id="on${i}" ${i<5?'checked':''}> Available</label><input type="time" id="start${i}" value="07:00"><input type="time" id="end${i}" value="19:00"></div>`})}
+function saveAvailability(){const data={name:empName.value,type:empType.value,hours:+prefHours.value,backup:backup.value,days:days.map((d,i)=>({day:d,on:document.getElementById('on'+i).checked,start:document.getElementById('start'+i).value,end:document.getElementById('end'+i).value}))};localStorage.setItem('staffsync_availability',JSON.stringify(data));saveMsg.textContent='Saved. Managers can now schedule within these limits.';setTimeout(()=>saveMsg.textContent='',3200)}
+function renderSchedule(){mySchedule.innerHTML=shifts.map(s=>`<div class="shift"><strong>${s.day} · ${s.label}</strong><span class="muted small">${s.time}</span></div>`).join('');swapShift.innerHTML=calloutShift.innerHTML=shifts.map(s=>`<option value="${s.id}">${s.day} · ${s.time}</option>`).join('')}
+function renderSwaps(){swapBoard.innerHTML=swaps.map(s=>`<div class="swapitem"><div class="row space"><strong>${s.person}</strong><span class="status ${s.status==='Open'?'ok':'warn'}">${s.status}</span></div><div class="small" style="margin-top:6px">Offering: ${s.shift}</div><div class="small muted">Wants: ${s.want}</div>${s.status==='Open'?`<button class="btn ghost" style="margin-top:10px" onclick="acceptSwap(${s.id})">Accept compatible swap</button>`:''}</div>`).join('');swapCount.textContent=swaps.filter(x=>x.status==='Open').length}
+function postSwap(){const s=shifts.find(x=>x.id==swapShift.value);swaps.unshift({id:Date.now(),person:empName.value||'Alex Rivera',shift:`${s.day} · ${s.time}`,want:swapPref.value,status:'Open'});renderSwaps();}
+function acceptSwap(id){const s=swaps.find(x=>x.id===id);s.status='Accepted';renderSwaps();alert('Swap accepted. In a production version, the manager and both employees would receive confirmation.');}
+function renderBackups(){backupList.innerHTML=backups.map(b=>`<div class="candidate"><div><strong>${b[0]}</strong><div class="small muted">${b[1]} · ${b[2]}</div></div><button class="btn ghost" onclick="this.textContent='Contacted';this.disabled=true">Contact</button></div>`).join('')}
+function reportCallout(){const s=shifts.find(x=>x.id==calloutShift.value);calloutMsg.textContent=`Callout reported for ${s.day}, ${s.time}. Backup search started.`;coverage.unshift([s.day,s.label,2,3]);renderCoverage();openTab('manager')}
+function renderCoverage(){const body=document.querySelector('#coverageTable tbody');body.innerHTML=coverage.map((r,i)=>{const ok=r[2]>=r[3];return `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="status ${ok?'ok':'bad'}"><span class="dot"></span>${ok?'Covered':'Gap'}</span></td><td>${ok?'—':`<button class="btn ghost" onclick="showRec('${r[0]} ${r[1]}')">Find backup</button>`}</td></tr>`}).join('');const gaps=coverage.filter(r=>r[2]<r[3]).length;urgentGaps.textContent=gaps;gapCount.textContent=gaps;coverageScore.textContent=Math.round((coverage.length-gaps)/coverage.length*100)+'%'}
+function showRec(label){recommendations.innerHTML=`<div class="notice"><strong>${label}</strong>: Suggested backup is Taylor Kim (available and below preferred hours). Secondary option: Jordan Patel.</div>`}
+function autofill(){const gaps=coverage.filter(r=>r[2]<r[3]);recommendations.innerHTML=gaps.length?gaps.map((g,i)=>`<div class="candidate"><div><strong>${g[0]} · ${g[1]}</strong><div class="small muted">Suggested: ${backups[i%backups.length][0]} · ${backups[i%backups.length][2]}</div></div><button class="btn primary" onclick="this.textContent='Assigned';this.disabled=true">Assign</button></div>`).join(''):'<div class="status ok">All shifts covered</div>'}
+initDays();renderSchedule();renderSwaps();renderBackups();renderCoverage();initQR();
+const startView=new URLSearchParams(window.location.search).get('view');
+if(startView && document.getElementById(startView)) openTab(startView);
+</script>
+</body>
+</html>
