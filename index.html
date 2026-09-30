@@ -67,7 +67,7 @@ nav{display:flex;gap:8px;overflow:auto;margin:18px 0;padding-bottom:2px}.tab{bor
       <div class="card"><h3>How it works</h3><div class="list">
         <div>1. Employees scan the QR and submit weekly availability.</div><div>2. The schedule engine compares coverage to minimum staffing.</div><div>3. Callouts trigger a backup candidate list instead of a staffing scramble.</div><div>4. Employees can offer and accept compatible shift swaps instantly.</div>
       </div></div>
-      <div class="card"><h3>Smart callout protection</h3><p class="muted">Rather than labeling individual employees as “likely to call out,” StaffSync adds a staffing buffer to historically fragile shifts and keeps a voluntary backup pool.</p><div class="notice">Demo rule: Friday evening and weekend morning shifts target +1 reserve employee when availability allows.</div></div>
+      <div class="card"><h3>Smart callout protection</h3><p class="muted">Rather than labeling individual employees as “likely to call out,” StaffSync adds a staffing buffer to historically fragile shifts and keeps a voluntary backup pool.</p><div class="notice">Demo rule: Friday night and weekend day shifts target +1 reserve RN when availability allows.</div></div>
     </div>
   </section>
 
@@ -77,8 +77,9 @@ nav{display:flex;gap:8px;overflow:auto;margin:18px 0;padding-bottom:2px}.tab{bor
       <div class="formgrid" style="margin:14px 0">
         <div class="field"><label>Employee name</label><input id="empName" value="Jacqueline Ye" /></div>
         <div class="field"><label>Role</label><input id="empRole" value="RN" /></div>
+        <div class="field"><label>Primary shift</label><input id="empShift" value="Night · 7:30 PM – 8:00 AM" readonly /></div>
         <div class="field"><label>Employment type</label><select id="empType"><option>Full time</option><option>Part time</option></select></div>
-        <div class="field"><label>Preferred weekly hours</label><input id="prefHours" type="number" value="40" min="4" max="60" /></div>
+        <div class="field"><label>Preferred weekly hours</label><input id="prefHours" type="number" value="36" min="4" max="60" /></div>
         <div class="field"><label>Can join backup pool?</label><select id="backup"><option>Yes</option><option>No</option></select></div>
       </div>
       <div id="days"></div>
@@ -88,8 +89,8 @@ nav{display:flex;gap:8px;overflow:auto;margin:18px 0;padding-bottom:2px}.tab{bor
 
   <section id="schedule" class="section">
     <div class="grid cols2">
-      <div class="card"><h2>My Schedule</h2><p class="muted">Sample schedule for Jacqueline Ye · RN</p><div id="mySchedule"></div></div>
-      <div class="card"><h3>Weekly hours</h3><div class="metric">36</div><div class="coverage"><span style="width:90%"></span></div><p class="small muted">36 of 40 preferred hours scheduled.</p><button class="btn ghost" onclick="openTab('availability')">Update availability</button></div>
+      <div class="card"><h2>My Schedule</h2><p class="muted">Sample schedule for Jacqueline Ye · RN · Night shift</p><div id="mySchedule"></div></div>
+      <div class="card"><h3>Weekly hours</h3><div class="metric">36</div><div class="coverage"><span style="width:100%"></span></div><p class="small muted">3 night shifts · 36 of 36 preferred hours scheduled.</p><button class="btn ghost" onclick="openTab('availability')">Update availability</button></div>
     </div>
   </section>
 
@@ -97,7 +98,7 @@ nav{display:flex;gap:8px;overflow:auto;margin:18px 0;padding-bottom:2px}.tab{bor
     <div class="grid cols2">
       <div class="card"><h2>Offer a Shift</h2><p class="muted">Post one of your assigned shifts to the swap board.</p>
         <div class="field"><label>Your shift</label><select id="swapShift"></select></div>
-        <div class="field" style="margin-top:10px"><label>Preferred replacement</label><select id="swapPref"><option>Any compatible shift</option><option>Morning shift</option><option>Evening shift</option><option>Night shift</option></select></div>
+        <div class="field" style="margin-top:10px"><label>Preferred replacement</label><select id="swapPref"><option>Any compatible night shift</option><option>Night shift · 7:30 PM – 8:00 AM</option><option>Day shift · 7:30 AM – 8:00 PM</option></select></div>
         <button class="btn primary full" style="margin-top:12px" onclick="postSwap()">Post swap request</button>
       </div>
       <div class="card"><div class="row space"><h2>Swap Board</h2><span class="status ok"><span class="dot"></span>Instant accept</span></div><div id="swapBoard"></div></div>
@@ -127,24 +128,28 @@ nav{display:flex;gap:8px;overflow:auto;margin:18px 0;padding-bottom:2px}.tab{bor
 <script>
 const days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const shifts=[
-{id:1,day:'Monday',time:'7:00 AM – 3:00 PM',label:'Morning'},
-{id:2,day:'Tuesday',time:'3:00 PM – 11:00 PM',label:'Evening'},
-{id:3,day:'Thursday',time:'7:00 AM – 3:00 PM',label:'Morning'},
-{id:4,day:'Friday',time:'3:00 PM – 11:00 PM',label:'Evening'},
-{id:5,day:'Sunday',time:'7:00 AM – 11:00 AM',label:'Morning'}
+{id:1,day:'Monday',time:'7:30 PM – 8:00 AM',label:'Night'},
+{id:2,day:'Wednesday',time:'7:30 PM – 8:00 AM',label:'Night'},
+{id:3,day:'Friday',time:'7:30 PM – 8:00 AM',label:'Night'}
 ];
 let swaps=[
-{id:101,person:'June Sun, RN',shift:'Saturday · 7:00 AM – 3:00 PM',want:'Evening shift',status:'Open'},
-{id:102,person:'Troy Dizon, RN',shift:'Wednesday · 3:00 PM – 11:00 PM',want:'Morning shift',status:'Open'}
+{id:101,person:'June Sun, RN · Night shift',shift:'Saturday · 7:30 PM – 8:00 AM',want:'Another night shift',status:'Open'},
+{id:102,person:'Troy Dizon, RN · Night shift',shift:'Wednesday · 7:30 PM – 8:00 AM',want:'Another night shift',status:'Open'}
 ];
 let coverage=[
-['Monday','Morning',3,3],['Monday','Evening',4,3],['Tuesday','Morning',3,3],['Tuesday','Evening',3,3],['Wednesday','Morning',2,3],['Wednesday','Night',3,3],['Thursday','Morning',4,3],['Friday','Evening',3,4],['Saturday','Morning',3,4],['Sunday','Morning',4,4]
+['Monday','Day · 7:30 AM–8:00 PM',3,3],['Monday','Night · 7:30 PM–8:00 AM',3,3],
+['Tuesday','Day · 7:30 AM–8:00 PM',3,3],['Tuesday','Night · 7:30 PM–8:00 AM',3,3],
+['Wednesday','Day · 7:30 AM–8:00 PM',2,3],['Wednesday','Night · 7:30 PM–8:00 AM',3,3],
+['Thursday','Day · 7:30 AM–8:00 PM',4,3],['Thursday','Night · 7:30 PM–8:00 AM',3,3],
+['Friday','Day · 7:30 AM–8:00 PM',3,3],['Friday','Night · 7:30 PM–8:00 AM',3,4],
+['Saturday','Day · 7:30 AM–8:00 PM',3,4],['Saturday','Night · 7:30 PM–8:00 AM',4,4],
+['Sunday','Day · 7:30 AM–8:00 PM',4,4],['Sunday','Night · 7:30 PM–8:00 AM',3,3]
 ];
 const backups=[
-['Maria Santos','RN','Part time','Available · 7 AM–3 PM'],
-['Angela Reyes','RN','Full time','Backup pool · flexible'],
-['Camille Bautista','RN','Part time','Available · evenings'],
-['Patricia Mendoza','RN','Full time','Available · weekends']
+['Maria Santos','RN','Part time','Day shift · 7:30 AM–8:00 PM'],
+['Angela Reyes','RN','Full time','Night shift · 7:30 PM–8:00 AM'],
+['Camille Bautista','RN','Part time','Day shift · 7:30 AM–8:00 PM'],
+['Patricia Mendoza','RN','Full time','Night shift · weekends']
 ];
 
 function employeeLinkFrom(base){
@@ -192,16 +197,16 @@ async function copyQRLink(){
 function openTab(id){document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelector(`.tab[data-tab="${id}"]`).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
 document.getElementById('tabs').addEventListener('click',e=>{if(e.target.matches('.tab'))openTab(e.target.dataset.tab)});
 
-function initDays(){const host=document.getElementById('days');host.innerHTML='';days.forEach((d,i)=>{host.innerHTML+=`<div class="dayrow"><strong>${d}</strong><label class="small"><input type="checkbox" id="on${i}" ${i<5?'checked':''}> Available</label><input type="time" id="start${i}" value="07:00"><input type="time" id="end${i}" value="19:00"></div>`})}
-function saveAvailability(){const data={name:empName.value,role:empRole.value,type:empType.value,hours:+prefHours.value,backup:backup.value,days:days.map((d,i)=>({day:d,on:document.getElementById('on'+i).checked,start:document.getElementById('start'+i).value,end:document.getElementById('end'+i).value}))};localStorage.setItem('staffsync_availability',JSON.stringify(data));saveMsg.textContent='Saved. Managers can now schedule within these limits.';setTimeout(()=>saveMsg.textContent='',3200)}
+function initDays(){const host=document.getElementById('days');host.innerHTML='';days.forEach((d,i)=>{host.innerHTML+=`<div class="dayrow"><strong>${d}</strong><label class="small"><input type="checkbox" id="on${i}" ${i<5?'checked':''}> Available</label><input type="time" id="start${i}" value="19:30"><input type="time" id="end${i}" value="08:00"></div>`})}
+function saveAvailability(){const data={name:empName.value,role:empRole.value,shift:empShift.value,type:empType.value,hours:+prefHours.value,backup:backup.value,days:days.map((d,i)=>({day:d,on:document.getElementById('on'+i).checked,start:document.getElementById('start'+i).value,end:document.getElementById('end'+i).value}))};localStorage.setItem('staffsync_availability',JSON.stringify(data));saveMsg.textContent='Saved. Managers can now schedule within these limits.';setTimeout(()=>saveMsg.textContent='',3200)}
 function renderSchedule(){mySchedule.innerHTML=shifts.map(s=>`<div class="shift"><strong>${s.day} · ${s.label}</strong><span class="muted small">${s.time}</span></div>`).join('');swapShift.innerHTML=calloutShift.innerHTML=shifts.map(s=>`<option value="${s.id}">${s.day} · ${s.time}</option>`).join('')}
 function renderSwaps(){swapBoard.innerHTML=swaps.map(s=>`<div class="swapitem"><div class="row space"><strong>${s.person}</strong><span class="status ${s.status==='Open'?'ok':'warn'}">${s.status}</span></div><div class="small" style="margin-top:6px">Offering: ${s.shift}</div><div class="small muted">Wants: ${s.want}</div>${s.status==='Open'?`<button class="btn ghost" style="margin-top:10px" onclick="acceptSwap(${s.id})">Accept compatible swap</button>`:''}</div>`).join('');swapCount.textContent=swaps.filter(x=>x.status==='Open').length}
-function postSwap(){const s=shifts.find(x=>x.id==swapShift.value);swaps.unshift({id:Date.now(),person:(empName.value||'Jacqueline Ye')+', '+(empRole.value||'RN'),shift:`${s.day} · ${s.time}`,want:swapPref.value,status:'Open'});renderSwaps();}
+function postSwap(){const s=shifts.find(x=>x.id==swapShift.value);swaps.unshift({id:Date.now(),person:(empName.value||'Jacqueline Ye')+', '+(empRole.value||'RN')+' · Night shift',shift:`${s.day} · ${s.time}`,want:swapPref.value,status:'Open'});renderSwaps();}
 function acceptSwap(id){const s=swaps.find(x=>x.id===id);s.status='Accepted';renderSwaps();alert('Swap accepted. In a production version, the manager and both employees would receive confirmation.');}
 function renderBackups(){backupList.innerHTML=backups.map(b=>`<div class="candidate"><div><strong>${b[0]}, ${b[1]}</strong><div class="small muted">${b[2]} · ${b[3]}</div></div><button class="btn ghost" onclick="this.textContent='Contacted';this.disabled=true">Contact</button></div>`).join('')}
-function reportCallout(){const s=shifts.find(x=>x.id==calloutShift.value);calloutMsg.textContent=`Callout reported for ${s.day}, ${s.time}. Backup search started.`;coverage.unshift([s.day,s.label,2,3]);renderCoverage();openTab('manager')}
+function reportCallout(){const s=shifts.find(x=>x.id==calloutShift.value);calloutMsg.textContent=`Callout reported for ${s.day}, ${s.time}. Backup search started.`;coverage.unshift([s.day,s.label+' · '+s.time,2,3]);renderCoverage();openTab('manager')}
 function renderCoverage(){const body=document.querySelector('#coverageTable tbody');body.innerHTML=coverage.map((r,i)=>{const ok=r[2]>=r[3];return `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="status ${ok?'ok':'bad'}"><span class="dot"></span>${ok?'Covered':'Gap'}</span></td><td>${ok?'—':`<button class="btn ghost" onclick="showRec('${r[0]} ${r[1]}')">Find backup</button>`}</td></tr>`}).join('');const gaps=coverage.filter(r=>r[2]<r[3]).length;urgentGaps.textContent=gaps;gapCount.textContent=gaps;coverageScore.textContent=Math.round((coverage.length-gaps)/coverage.length*100)+'%'}
-function showRec(label){recommendations.innerHTML=`<div class="notice"><strong>${label}</strong>: Suggested backup is Maria Santos, RN (available and below preferred hours). Secondary option: Angela Reyes, RN.</div>`}
+function showRec(label){recommendations.innerHTML=`<div class="notice"><strong>${label}</strong>: Suggested backup is Angela Reyes, RN (night-shift qualified and available). Secondary option: Patricia Mendoza, RN.</div>`}
 function autofill(){const gaps=coverage.filter(r=>r[2]<r[3]);recommendations.innerHTML=gaps.length?gaps.map((g,i)=>`<div class="candidate"><div><strong>${g[0]} · ${g[1]}</strong><div class="small muted">Suggested: ${backups[i%backups.length][0]}, ${backups[i%backups.length][1]} · ${backups[i%backups.length][3]}</div></div><button class="btn primary" onclick="this.textContent='Assigned';this.disabled=true">Assign</button></div>`).join(''):'<div class="status ok">All shifts covered</div>'}
 initDays();renderSchedule();renderSwaps();renderBackups();renderCoverage();initQR();
 const startView=new URLSearchParams(window.location.search).get('view');
